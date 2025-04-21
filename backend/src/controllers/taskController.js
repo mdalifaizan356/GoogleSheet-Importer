@@ -7,10 +7,10 @@ const taskController ={
 // Create Task
     createTask: async(req, res)=>{
         try {
+            const {id} = req.user;    
             const {Title, Description, DueDate} = req.body;
-            console.log(Title, Description, DueDate);
 
-            const duplicateTask = await taskModel.findOne({Title});
+            const duplicateTask = await taskModel.findOne({UserId :id ,Title: Title});
 
             if(duplicateTask){
             return res.status(400).json({ message: "Task Already Exist" });
@@ -18,6 +18,7 @@ const taskController ={
             }
 
             const newTask = new taskModel({
+                UserId: id,
                 Title,
                 Description,
                 DueDate
@@ -35,7 +36,8 @@ const taskController ={
 //Get All Task
     allTasks: async(req, res)=>{
         try {
-            const tasks = await taskModel.find();
+            const {id} = req.user;    
+            const tasks = await taskModel.find({UserId:id});
             return res.status(200).json({ message: "Add Task Successfully", tasks:tasks });
         }
         catch (error) {
@@ -107,31 +109,37 @@ deleteTask: async(req, res)=>{
 
 //Import link data
     importData: async (req, res) => {            
-  try {
-    const { sheetUrl } = req.body;
-    const match = sheetUrl.match(/\/d\/(.*?)\//);
-    if (!match) return res.status(400).send('Invalid sheet URL');
-
-    const sheetId = match[1];
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-
-    const response = await axios.get(csvUrl);
-    const csvData = response.data;
-
-    const rows = [];
-    const stream = Readable.from([csvData]);
-
-    stream.pipe(csv())
-      .on('data', (data) => rows.push(data))
-      .on('end', async () => {
-        await taskModel.insertMany(rows);
-        res.send({ message: 'Data imported successfully', count: rows.length });
-      });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Failed to import data');
-  }
+    try {
+        const { id } = req.user;
+        const { sheetUrl } = req.body;
+        const match = sheetUrl.match(/\/d\/(.*?)\//);
+        if (!match) return res.status(400).send('Invalid sheet URL');
+    
+        const sheetId = match[1];
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+    
+        const response = await axios.get(csvUrl);
+        const csvData = response.data;
+    
+        const rows = [];
+        const stream = Readable.from([csvData]);
+    
+        stream.pipe(csv())
+            .on('data', (data) => rows.push(data))
+            .on('end', async () => {
+            const tasksWithUserId = rows.map(row => ({
+                ...row,
+                UserId: id,
+            }));
+    
+            await taskModel.insertMany(tasksWithUserId);
+            res.send({ message: 'Data imported successfully', count: tasksWithUserId.length });
+            });
+    
+        } catch (error) {
+        console.error(error);
+        res.status(500).send('Failed to import data');
+        }
   },
   
 };

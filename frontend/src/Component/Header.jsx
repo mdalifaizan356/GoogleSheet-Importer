@@ -9,7 +9,7 @@ const Header = () => {
       <Container fluid>
         <Row>
           <Col className="bg-dark d-flex justify-content-center">
-          <h1 style={{color:"white"}}>Manage Task With<span style={{ color: "red" }}> GoogleSheet</span></h1>
+          <h1 style={{color:"white"}}>GoogleSheet <span style={{ color: "red" }}> Importer</span></h1>
           </Col>
         </Row>
       </Container>

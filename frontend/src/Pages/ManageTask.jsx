@@ -17,14 +17,14 @@ const ManageTask = () => {
           {/* Left Side - Forms */}
           <Col md={4}>
             <Card className="mb-3">
-              <Card.Header className="bg-primary text-white">📥 Import Tasks</Card.Header>
+              <Card.Header className="bg-primary text-white">Import Tasks</Card.Header>
               <Card.Body>
                 <ImportTask setRefreh={setRefreh} refresh={refresh} />
               </Card.Body>
             </Card>
 
             <Card>
-              <Card.Header className="bg-success text-white">➕ Add New Task</Card.Header>
+              <Card.Header className="bg-success text-white">Add New Task</Card.Header>
               <Card.Body>
                 <AddTask setRefreh={setRefreh} refresh={refresh} />
               </Card.Body>
@@ -34,7 +34,7 @@ const ManageTask = () => {
           {/* Right Side - Task Table */}
           <Col md={8}>
             <Card>
-              <Card.Header className="bg-dark text-white">📋 All Tasks</Card.Header>
+              <Card.Header className="bg-dark text-white">All Tasks</Card.Header>
               <Card.Body>
                 <TaskTable setRefreh={setRefreh} refresh={refresh} />
               </Card.Body>
